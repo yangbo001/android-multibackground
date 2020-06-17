@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="background_extension">
+        <attr name="background_stroke_width" format="dimension" />
+        <attr name="background_stroke_dash_width" format="dimension" />
+        <attr name="background_stroke_dash_gap" format="dimension" />
+        <attr name="background_stroke_color" format="color" />
+        <attr name="background_stroke_pressed" format="color" />
+        <attr name="background_stroke_checked" format="color" />
+        <attr name="background_stroke_disable" format="color" />
+        <attr name="background_corner_radius" format="dimension" />
+        <attr name="background_corner_radius_tl" format="dimension" />
+        <attr name="background_corner_radius_tr" format="dimension" />
+        <attr name="background_corner_radius_bl" format="dimension" />
+        <attr name="background_corner_radius_br" format="dimension" />
+        <attr name="background_shadow_color" format="color" />
+        <attr name="background_shadow_radius" format="dimension" />
+        <attr name="background_shadow_offset_x" format="dimension" />
+        <attr name="background_shadow_offset_y" format="dimension" />
+        <attr name="background_state_pressed" format="reference" />
+        <attr name="background_state_pressed_ripple" format="color" />
+        <attr name="background_state_checked" format="reference" />
+        <attr name="background_state_disable" format="reference" />
+        <attr name="text_pressed_color" format="color" />
+        <attr name="text_checked_color" format="color" />
+        <attr name="text_disable_color" format="color" />
+        <attr name="compound_drawable_width" format="dimension" />
+        <attr name="compound_drawable_height" format="dimension" />
+        <attr name="compound_drawable_align_to_text" format="boolean" />
+    </declare-styleable>
+</resources>

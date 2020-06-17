@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="corner"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <support.background.extension.ExtendImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:background="@mipmap/background"
+            app:background_corner_radius="8dp" />
+
+        <support.background.extension.ExtendImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:background="@mipmap/background"
+            app:background_corner_radius_br="20dp"
+            app:background_corner_radius_tl="20dp" />
+
+        <support.background.extension.ExtendImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:background="@color/colorPrimary"
+            app:background_corner_radius_bl="20dp"
+            app:background_corner_radius_tr="20dp" />
+
+        <support.background.extension.ExtendImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:background="@color/colorPrimary"
+            app:background_corner_radius="60dp" />
+    </LinearLayout>
+</LinearLayout>

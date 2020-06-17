@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="compound drawable"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <support.background.extension.ExtendTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_translucence"
+            android:drawableStart="@mipmap/background"
+            android:drawablePadding="1dp"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="drawable resize:20dp X 20dp"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            app:compound_drawable_height="20dp"
+            app:compound_drawable_width="20dp" />
+
+        <support.background.extension.ExtendTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/gray_translucence"
+            android:drawableStart="@mipmap/background"
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:layout_marginTop="10dp"
+            android:paddingBottom="10dp"
+            android:text="drawable align to text"
+            android:textColor="@android:color/white"
+            android:textSize="15sp"
+            app:compound_drawable_align_to_text="true"
+            app:compound_drawable_height="20dp"
+            app:compound_drawable_width="20dp" />
+    </LinearLayout>
+</LinearLayout>

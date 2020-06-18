@@ -1,5 +1,6 @@
 package support.background.extension.core;
 
+import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,14 +9,9 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
-import android.os.Build;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-
-@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+// require Build.VERSION_CODES.LOLLIPOP
+@SuppressLint("NewApi")
 class ExtendRippleDrawable extends RippleDrawable {
 
     Path path = new Path();
@@ -37,7 +33,7 @@ class ExtendRippleDrawable extends RippleDrawable {
      * @param content The content drawable, may be {@code null}
      * @param mask    The mask drawable, may be {@code null}
      */
-    public ExtendRippleDrawable(@NonNull ColorStateList color, @Nullable Drawable content, @Nullable Drawable mask) {
+    public ExtendRippleDrawable(ColorStateList color, Drawable content, Drawable mask) {
         super(color, content, mask);
     }
 
@@ -49,7 +45,7 @@ class ExtendRippleDrawable extends RippleDrawable {
     }
 
     @Override
-    public void setBounds(@NonNull Rect b) {
+    public void setBounds(Rect b) {
         b.set(b.left + drawableShadowPadding[0], b.top + drawableShadowPadding[1],
                 b.right - drawableShadowPadding[2], b.bottom - drawableShadowPadding[3]);
         super.setBounds(b);
@@ -63,7 +59,7 @@ class ExtendRippleDrawable extends RippleDrawable {
     }
 
     @Override
-    public void draw(@NonNull Canvas canvas) {
+    public void draw(Canvas canvas) {
         if (shadowRadius > 0) { // draw shadow
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
             paint.setStrokeWidth(strokeWidth);
@@ -85,7 +81,7 @@ class ExtendRippleDrawable extends RippleDrawable {
         return this;
     }
 
-    ExtendRippleDrawable setShadow(@ColorInt int color, int radius, int offsetX, int offsetY) {
+    ExtendRippleDrawable setShadow(int color, int radius, int offsetX, int offsetY) {
         this.shadowColor = color;
         this.shadowRadius = radius;
         this.shadowOffsetX = offsetX;

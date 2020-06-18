@@ -2,12 +2,11 @@ package support.background.extension;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
-import androidx.appcompat.widget.AppCompatImageView;
+import android.widget.ImageView;
 
 import support.background.extension.core.BackgroundBuilder;
 
-public class ExtendImageView extends AppCompatImageView {
+public class ExtendImageView extends ImageView {
 
     public ExtendImageView(Context context, AttributeSet attrs) {
         super(context, attrs);

@@ -19,10 +19,6 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
-import androidx.core.content.ContextCompat;
-
 import java.lang.ref.WeakReference;
 
 import support.background.extension.R;
@@ -169,8 +165,8 @@ public class BackgroundBuilder {
     /**
      * set the background color
      */
-    public BackgroundBuilder setBackground(@ColorInt int color) {
-        background = new ColorDrawable(color);
+    public BackgroundBuilder setBackground(int colorInt) {
+        background = new ColorDrawable(colorInt);
         return this;
     }
 
@@ -178,8 +174,12 @@ public class BackgroundBuilder {
      * set the background drawable<br/>
      * <em>only bitmap、color、Gradient resource can be applied the attr settings<em/>
      */
-    public BackgroundBuilder setBackground(Context ctx, @DrawableRes int resId) {
-        background = ContextCompat.getDrawable(ctx, resId);
+    public BackgroundBuilder setBackground(Context ctx, int drawableResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            background = ctx.getDrawable(drawableResId);
+        } else {
+            background = ctx.getResources().getDrawable(drawableResId);
+        }
         return this;
     }
 
@@ -195,16 +195,16 @@ public class BackgroundBuilder {
     /**
      * set the background pressed showing
      */
-    public BackgroundBuilder setBackgroundPressed(@ColorInt int color) {
-        backgroundPressed = new ColorDrawable(color);
+    public BackgroundBuilder setBackgroundPressed(int colorInt) {
+        backgroundPressed = new ColorDrawable(colorInt);
         return this;
     }
 
     /**
      * set the background pressed showing, the animation is ripple effect
      */
-    public BackgroundBuilder setBackgroundPressedRippleColor(@ColorInt int color) {
-        backgroundPressedRipple = color;
+    public BackgroundBuilder setBackgroundPressedRippleColor(int colorInt) {
+        backgroundPressedRipple = colorInt;
         return this;
     }
 
@@ -212,8 +212,12 @@ public class BackgroundBuilder {
      * set the background pressed showing<br/>
      * <em>only bitmap、color、Gradient resource can be applied the attr settings<em/>
      */
-    public BackgroundBuilder setBackgroundPressed(Context ctx, @DrawableRes int resId) {
-        backgroundPressed = ContextCompat.getDrawable(ctx, resId);
+    public BackgroundBuilder setBackgroundPressed(Context ctx, int drawableResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            backgroundPressed = ctx.getDrawable(drawableResId);
+        } else {
+            backgroundPressed = ctx.getResources().getDrawable(drawableResId);
+        }
         return this;
     }
 
@@ -229,8 +233,8 @@ public class BackgroundBuilder {
     /**
      * set the background checked showing
      */
-    public BackgroundBuilder setBackgroundChecked(@ColorInt int color) {
-        backgroundChecked = new ColorDrawable(color);
+    public BackgroundBuilder setBackgroundChecked(int colorInt) {
+        backgroundChecked = new ColorDrawable(colorInt);
         return this;
     }
 
@@ -238,8 +242,12 @@ public class BackgroundBuilder {
      * set the background checked showing<br/>
      * <em>only bitmap、color、Gradient resource can be applied the attr settings<em/>
      */
-    public BackgroundBuilder setBackgroundChecked(Context ctx, @DrawableRes int resId) {
-        backgroundChecked = ContextCompat.getDrawable(ctx, resId);
+    public BackgroundBuilder setBackgroundChecked(Context ctx, int drawableResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            backgroundChecked = ctx.getDrawable(drawableResId);
+        } else {
+            backgroundChecked = ctx.getResources().getDrawable(drawableResId);
+        }
         return this;
     }
 
@@ -255,8 +263,8 @@ public class BackgroundBuilder {
     /**
      * set the background disabled showing
      */
-    public BackgroundBuilder setBackgroundDisable(@ColorInt int color) {
-        backgroundDisable = new ColorDrawable(color);
+    public BackgroundBuilder setBackgroundDisable(int colorInt) {
+        backgroundDisable = new ColorDrawable(colorInt);
         return this;
     }
 
@@ -264,8 +272,12 @@ public class BackgroundBuilder {
      * set the background disabled showing<br/>
      * <em>only bitmap、color、Gradient resource can be applied the attr settings<em/>
      */
-    public BackgroundBuilder setBackgroundDisable(Context ctx, @DrawableRes int resId) {
-        backgroundDisable = ContextCompat.getDrawable(ctx, resId);
+    public BackgroundBuilder setBackgroundDisable(Context ctx, int drawableResId) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            backgroundDisable = ctx.getDrawable(drawableResId);
+        } else {
+            backgroundDisable = ctx.getResources().getDrawable(drawableResId);
+        }
         return this;
     }
 
@@ -292,12 +304,12 @@ public class BackgroundBuilder {
     /**
      * set the background outline stroke
      *
-     * @param width the stroke width
-     * @param color the color width
+     * @param width    the stroke width
+     * @param colorInt the stroke color
      */
-    public BackgroundBuilder setStroke(int width, @ColorInt int color) {
+    public BackgroundBuilder setStroke(int width, int colorInt) {
         this.strokeWidth = width;
-        this.strokeColor = color;
+        this.strokeColor = colorInt;
         return this;
     }
 
@@ -305,54 +317,54 @@ public class BackgroundBuilder {
      * set the background outline stroke
      *
      * @param width     the stroke width
-     * @param color     the stroke color
+     * @param colorInt  the stroke color
      * @param dashWidth the length of the dashes
      * @param dashGap   the gap between dashes
      */
-    public BackgroundBuilder setStroke(int width, @ColorInt int color, int dashWidth, int dashGap) {
+    public BackgroundBuilder setStroke(int width, int colorInt, int dashWidth, int dashGap) {
         this.strokeDashWidth = dashWidth;
         this.strokeDashGap = dashGap;
-        return setStroke(width, color);
+        return setStroke(width, colorInt);
     }
 
     /**
      * set the background outline stroke
      *
-     * @param width   the stroke width
-     * @param color   the color width
-     * @param pressed when view pressed, the stroke showing color
-     * @param checked when view checked, the stroke showing color
-     * @param disable when view disable, the stroke showing color
+     * @param width           the stroke width
+     * @param colorInt        the color width
+     * @param pressedColorInt when view pressed, the stroke showing color
+     * @param checkedColorInt when view checked, the stroke showing color
+     * @param disableColorInt when view disable, the stroke showing color
      */
-    public BackgroundBuilder setStroke(int width, @ColorInt int color, @ColorInt int pressed, @ColorInt int checked, @ColorInt int disable) {
-        this.strokePressedColor = pressed;
-        this.strokeCheckedColor = checked;
-        this.strokeDisableColor = disable;
-        return setStroke(width, color);
+    public BackgroundBuilder setStroke(int width, int colorInt, int pressedColorInt, int checkedColorInt, int disableColorInt) {
+        this.strokePressedColor = pressedColorInt;
+        this.strokeCheckedColor = checkedColorInt;
+        this.strokeDisableColor = disableColorInt;
+        return setStroke(width, colorInt);
     }
 
     /**
      * set the background outline stroke
      *
      * @param width     the stroke width
-     * @param color     the color width
+     * @param colorInt  the stroke color
      * @param pressed   when view pressed, the stroke showing color
      * @param checked   when view checked, the stroke showing color
      * @param disable   when view disable, the stroke showing color
      * @param dashWidth the length of the dashes
      * @param dashGap   the gap between dashes
      */
-    public BackgroundBuilder setStroke(int width, @ColorInt int color, @ColorInt int pressed, @ColorInt int checked, @ColorInt int disable, int dashWidth, int dashGap) {
-        setStroke(width, color, pressed, checked, disable);
-        return setStroke(width, color, dashWidth, dashGap);
+    public BackgroundBuilder setStroke(int width, int colorInt, int pressed, int checked, int disable, int dashWidth, int dashGap) {
+        setStroke(width, colorInt, pressed, checked, disable);
+        return setStroke(width, colorInt, dashWidth, dashGap);
     }
 
     /**
      * set the background shadow effect<br/> <em>you must invoke {@link BackgroundBuilder#setTargetView(View)} before or after to
      * calculate the right drawing area.<em/>
      */
-    public BackgroundBuilder setShadow(@ColorInt int color, int radius, int offsetX, int offsetY) {
-        this.shadowColor = color;
+    public BackgroundBuilder setShadow(int colorInt, int radius, int offsetX, int offsetY) {
+        this.shadowColor = colorInt;
         this.shadowRadius = radius;
         this.shadowOffsetX = offsetX;
         this.shadowOffsetY = offsetY;

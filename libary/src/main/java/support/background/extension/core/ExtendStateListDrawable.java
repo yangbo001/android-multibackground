@@ -11,9 +11,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.view.View;
 
-import androidx.annotation.ColorInt;
-import androidx.annotation.NonNull;
-
 class ExtendStateListDrawable extends StateListDrawable {
 
     Path path = new Path();
@@ -29,7 +26,7 @@ class ExtendStateListDrawable extends StateListDrawable {
     private int shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY;
     private int[] drawableShadowPadding = new int[4];// left,top,right,bottom
 
-    ExtendStateListDrawable(@NonNull Drawable normal, Drawable pressed, Drawable checked, @NonNull Drawable disable) {
+    ExtendStateListDrawable(Drawable normal, Drawable pressed, Drawable checked, Drawable disable) {
         this.normalDrawable = normal;
         this.disableDrawable = disable;
         this.pressedDrawable = pressed;
@@ -44,7 +41,7 @@ class ExtendStateListDrawable extends StateListDrawable {
     }
 
     @Override
-    public void setBounds(@NonNull Rect b) {
+    public void setBounds(Rect b) {
         b.set(b.left + drawableShadowPadding[0], b.top + drawableShadowPadding[1],
                 b.right - drawableShadowPadding[2], b.bottom - drawableShadowPadding[3]);
         super.setBounds(b);
@@ -90,7 +87,7 @@ class ExtendStateListDrawable extends StateListDrawable {
         return this;
     }
 
-    ExtendStateListDrawable setShadow(@ColorInt int color, int radius, int offsetX, int offsetY) {
+    ExtendStateListDrawable setShadow(int color, int radius, int offsetX, int offsetY) {
         this.shadowColor = color;
         this.shadowRadius = radius;
         this.shadowOffsetX = offsetX;

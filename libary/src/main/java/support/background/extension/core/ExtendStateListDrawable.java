@@ -1,5 +1,7 @@
 package support.background.extension.core;
 
+import android.graphics.Bitmap;
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,19 +11,18 @@ import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
+import android.os.Build;
 import android.view.View;
 
 class ExtendStateListDrawable extends StateListDrawable {
 
-    Path path = new Path();
-    RectF rectF = new RectF();
-    Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    Rect originDrawableRect = new Rect(); // the origin drawable rect
     Drawable normalDrawable, disableDrawable, pressedDrawable, checkedDrawable;
+
+    private float[] cornerRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
     // stroke
     private int strokeWidth, strokeDashWidth, strokeDashGap;
     private int strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor;
-    // corner
-    private float tlRadius, trRadius, blRadius, brRadius;
     // shadow
     private int shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY;
     private int[] drawableShadowPadding = new int[4];// left,top,right,bottom
@@ -35,28 +36,55 @@ class ExtendStateListDrawable extends StateListDrawable {
 
     @Override
     public void setBounds(int left, int top, int right, int bottom) {
+        originDrawableRect.set(left, top, right, bottom);
         super.setBounds(left + drawableShadowPadding[0], top + drawableShadowPadding[1],
                 right - drawableShadowPadding[2], bottom - drawableShadowPadding[3]);
-        setOutline(getBounds());
     }
 
     @Override
-    public void setBounds(Rect b) {
-        b.set(b.left + drawableShadowPadding[0], b.top + drawableShadowPadding[1],
-                b.right - drawableShadowPadding[2], b.bottom - drawableShadowPadding[3]);
-        super.setBounds(b);
-        setOutline(b);
-    }
-
-    private void setOutline(Rect b) {
-        rectF.set(b.left + strokeWidth / 2f, b.top + strokeWidth / 2f, b.right - strokeWidth / 2f, b.bottom - strokeWidth / 2f);
-        path.reset();
-        path.addRoundRect(rectF, getCornerRadius(), Path.Direction.CW);
+    public void setBounds(Rect bounds) {
+        originDrawableRect.set(bounds);
+        bounds.set(bounds.left + drawableShadowPadding[0], bounds.top + drawableShadowPadding[1],
+                bounds.right - drawableShadowPadding[2], bounds.bottom - drawableShadowPadding[3]);
     }
 
     @Override
     public void draw(Canvas canvas) {
-        if (shadowRadius > 0) { // draw shadow
+        if (shadowRadius > 0) compatDrawShadowLayer(canvas);
+        super.draw(canvas);
+    }
+
+    private void compatDrawShadowLayer(Canvas canvas) {
+        Path path = new Path();
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+        Rect rect = getBounds();
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            // create shadow layer
+            Bitmap bmp = Bitmap.createBitmap(originDrawableRect.width(), originDrawableRect.height(), Bitmap.Config.ARGB_8888);
+            Canvas bmpCvs = new Canvas(bmp);
+            paint.setMaskFilter(new BlurMaskFilter(shadowRadius / 3f * 2, BlurMaskFilter.Blur.NORMAL));
+            paint.setStyle(Paint.Style.FILL);
+            paint.setColor(shadowColor);
+            path.addRoundRect(new RectF(
+                    shadowRadius / 3f * 2,
+                    shadowRadius / 3f * 2,
+                    originDrawableRect.right - shadowRadius / 3f * 2,
+                    originDrawableRect.bottom - shadowRadius / 3f * 2), cornerRadius, Path.Direction.CW);
+            bmpCvs.drawPath(path, paint);
+            // draw the shadow bitmap with the size of drawable rect and move to the right position
+            Rect dstRect = new Rect(originDrawableRect);
+            if (shadowOffsetX != 0 || shadowOffsetY != 0) {
+                int l = rect.left - shadowRadius / 2 + shadowOffsetX;
+                int t = rect.top - shadowRadius / 2 + shadowOffsetY;
+                int r = rect.right + shadowRadius / 2 + shadowOffsetX;
+                int b = rect.bottom + shadowRadius / 2 + shadowOffsetY;
+                dstRect.set(l, t, r, b);
+            }
+            canvas.drawBitmap(bmp, null, dstRect, null);
+            bmp.recycle();
+        } else {
+            path.addRoundRect(new RectF(rect.left + strokeWidth / 2f, rect.top + strokeWidth / 2f,
+                    rect.right - strokeWidth / 2f, rect.bottom - strokeWidth / 2f), cornerRadius, Path.Direction.CW);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
             paint.setStrokeWidth(strokeWidth);
             paint.setShadowLayer(shadowRadius / 3f * 2, shadowOffsetX, shadowOffsetY, shadowColor);
@@ -64,14 +92,10 @@ class ExtendStateListDrawable extends StateListDrawable {
             canvas.drawPath(path, paint);
             paint.clearShadowLayer();
         }
-        super.draw(canvas);
     }
 
     ExtendStateListDrawable setCornerRadius(float tlRadius, float trRadius, float blRadius, float brRadius) {
-        this.tlRadius = tlRadius;
-        this.trRadius = trRadius;
-        this.blRadius = blRadius;
-        this.brRadius = brRadius;
+        cornerRadius = new float[]{tlRadius, tlRadius, trRadius, trRadius, brRadius, brRadius, blRadius, blRadius};
         return this;
     }
 
@@ -97,7 +121,7 @@ class ExtendStateListDrawable extends StateListDrawable {
     }
 
     void apply() {
-        normalDrawable = BackgroundBuilder.createCornerDrawable(normalDrawable, tlRadius, trRadius, blRadius, brRadius);
+        normalDrawable = BackgroundBuilder.createCornerDrawable(normalDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
         if (normalDrawable instanceof ExtendBitmapDrawable) {
             int pressColor = Color.TRANSPARENT, checkedColor = Color.TRANSPARENT, disableColor = Color.TRANSPARENT;
             if (pressedDrawable instanceof ColorDrawable) {
@@ -119,11 +143,11 @@ class ExtendStateListDrawable extends StateListDrawable {
         } else {
             BackgroundBuilder.setDrawableStroke(normalDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
         }
-        pressedDrawable = BackgroundBuilder.createCornerDrawable(pressedDrawable, tlRadius, trRadius, blRadius, brRadius);
+        pressedDrawable = BackgroundBuilder.createCornerDrawable(pressedDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
         BackgroundBuilder.setDrawableStroke(pressedDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
-        checkedDrawable = BackgroundBuilder.createCornerDrawable(checkedDrawable, tlRadius, trRadius, blRadius, brRadius);
+        checkedDrawable = BackgroundBuilder.createCornerDrawable(checkedDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
         BackgroundBuilder.setDrawableStroke(checkedDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
-        disableDrawable = BackgroundBuilder.createCornerDrawable(disableDrawable, tlRadius, trRadius, blRadius, brRadius);
+        disableDrawable = BackgroundBuilder.createCornerDrawable(disableDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
         BackgroundBuilder.setDrawableStroke(disableDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
 
         if (checkedDrawable != null) {
@@ -170,9 +194,5 @@ class ExtendStateListDrawable extends StateListDrawable {
         if (drawableShadowPadding[1] < 0) drawableShadowPadding[1] = 0;
         if (drawableShadowPadding[2] < 0) drawableShadowPadding[2] = 0;
         if (drawableShadowPadding[3] < 0) drawableShadowPadding[3] = 0;
-    }
-
-    private float[] getCornerRadius() {
-        return new float[]{tlRadius, tlRadius, trRadius, trRadius, brRadius, brRadius, blRadius, blRadius};
     }
 }

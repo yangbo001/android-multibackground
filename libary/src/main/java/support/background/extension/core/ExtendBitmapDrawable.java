@@ -54,7 +54,6 @@ class ExtendBitmapDrawable extends BitmapDrawable {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
         // draw state background color
         if (stateEnable) {
-            paint.setPathEffect(null);
             paint.setColor(currentBackgroundStateColor);
             paint.setStyle(Paint.Style.FILL_AND_STROKE);
             canvas.drawPath(path, paint);
@@ -66,6 +65,7 @@ class ExtendBitmapDrawable extends BitmapDrawable {
             paint.setStrokeWidth(strokeWidth);
             if (strokeDashWidth > 0) paint.setPathEffect(new DashPathEffect(new float[]{strokeDashWidth, strokeDashGap}, 0));
             canvas.drawPath(path, paint);
+            paint.setPathEffect(null);
         }
     }
 

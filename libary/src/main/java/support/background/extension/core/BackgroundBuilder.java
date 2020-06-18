@@ -144,7 +144,7 @@ public class BackgroundBuilder {
                 .setCornerRadius(cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius)
                 .setStroke(strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor)
                 .apply();
-        if (targetViewReference != null && targetViewReference.get() != null) {
+        if (shadowRadius > 0 && targetViewReference != null && targetViewReference.get() != null) {
             drawable.calculateAndSetPaddingForTargetView(targetViewReference.get());
             targetViewReference.clear();
         } else if (shadowRadius > 0) {

@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
+import support.background.extension.core.BackgroundBuilder;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override

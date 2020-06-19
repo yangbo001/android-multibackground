@@ -9,73 +9,6 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="background disable"
-        android:textColor="@android:color/black"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <support.background.extension.ExtendImageView
-                android:id="@+id/icon_disable_enable_default"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_margin="10dp"
-                android:background="@mipmap/background"
-                app:background_corner_radius="8dp"
-                app:background_stroke_color="@color/colorAccent"
-                app:background_stroke_width="2dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="default disable color"
-                android:textColor="@android:color/black"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <support.background.extension.ExtendImageView
-                android:id="@+id/icon_disable_enable"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_margin="10dp"
-                android:background="@mipmap/background"
-                app:background_corner_radius="8dp"
-                app:background_state_disable="@color/gray_translucence"
-                app:background_stroke_color="@color/colorAccent"
-                app:background_stroke_disable="@color/gray_translucence"
-                app:background_stroke_width="2dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="set disable color"
-                android:textColor="@android:color/black"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:text="radioGroup state"
         android:textColor="@android:color/black"
         android:textSize="15sp"
@@ -84,11 +17,12 @@
     <support.background.extension.ExtendRadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
         android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
+        android:orientation="horizontal"
         app:background_corner_radius="6dp"
+        android:background="@color/colorPrimary"
         app:background_shadow_color="@color/black_translucence"
         app:background_shadow_offset_x="4dp"
         app:background_shadow_offset_y="4dp"
@@ -139,4 +73,74 @@
             app:text_checked_color="@android:color/white"
             app:text_pressed_color="@android:color/holo_blue_light" />
     </support.background.extension.ExtendRadioGroup>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:text="background disable"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <support.background.extension.ExtendImageView
+                android:id="@+id/icon_disable_enable_default"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="@mipmap/background"
+                app:background_corner_radius="8dp"
+                app:background_stroke_color="@color/colorAccent"
+                app:background_stroke_width="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="default disable color"
+                android:textColor="@android:color/black"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <support.background.extension.ExtendImageView
+                android:id="@+id/icon_disable_enable"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                android:background="@mipmap/background"
+                app:background_corner_radius="8dp"
+                app:background_state_disable="@color/gray_translucence"
+                app:background_stroke_color="@color/colorAccent"
+                app:background_stroke_disable="@color/gray_translucence"
+                app:background_stroke_width="2dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="set disable color"
+                android:textColor="@android:color/black"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

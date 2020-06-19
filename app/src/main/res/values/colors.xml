@@ -6,4 +6,5 @@
 
     <color name="black_translucence">#70000000</color>
     <color name="gray_translucence">#aaBBBBBB</color>
+    <color name="colorAccent_translucence">#aa03DAC5</color>
 </resources>

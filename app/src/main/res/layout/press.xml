@@ -72,11 +72,10 @@
         <support.background.extension.ExtendImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_margin="10dp"
             android:background="@color/colorPrimary"
             android:clickable="true"
             app:background_corner_radius="60dp"
-            app:background_shadow_color="@color/black_translucence"
+            app:background_shadow_color="@color/colorPrimary"
             app:background_shadow_offset_x="4dp"
             app:background_shadow_offset_y="-4dp"
             app:background_shadow_radius="4dp"

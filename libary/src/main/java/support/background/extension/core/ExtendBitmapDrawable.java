@@ -102,8 +102,8 @@ class ExtendBitmapDrawable extends BitmapDrawable {
         return super.onStateChange(stateSet);
     }
 
-    ExtendBitmapDrawable setCornerRadius(float tlRadius, float trRadius, float blRadius, float brRadius) {
-        this.cornerRadius = new float[]{tlRadius, tlRadius, trRadius, trRadius, brRadius, brRadius, blRadius, blRadius};
+    ExtendBitmapDrawable setCornerRadius(float[] radius) {
+        this.cornerRadius = radius;
         return this;
     }
 

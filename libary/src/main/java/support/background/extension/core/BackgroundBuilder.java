@@ -71,7 +71,7 @@ import support.background.extension.R;
  */
 @SuppressWarnings("unused")
 public class BackgroundBuilder {
-    private final int defaultDisableColor = Color.parseColor("#DDDDDD");
+    static final int defaultDisableColor = Color.parseColor("#DDDDDD");
 
     private int strokeWidth;
     private int strokeDashWidth;
@@ -113,44 +113,28 @@ public class BackgroundBuilder {
      */
     public Drawable buildDrawable() {
         if (background == null) background = new ColorDrawable(Color.TRANSPARENT);
+        ShadowDrawable targetDrawable = null;
         if (backgroundPressedRipple != Color.TRANSPARENT && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            background = createCornerDrawable(background, cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius);
-            setDrawableStroke(background, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
-            if (background instanceof ExtendBitmapDrawable && backgroundDisable instanceof ColorDrawable) {
-                ((ExtendBitmapDrawable) background)
-                        .setBackgroundStateColor(Color.TRANSPARENT, Color.TRANSPARENT, ((ColorDrawable) backgroundDisable).getColor())
-                        .setStateEnable();
-            }
-            GradientDrawable mask = new GradientDrawable();
-            mask.setColor(defaultDisableColor);
-            mask.setCornerRadii(
-                    new float[]{cornerTlRadius, cornerTlRadius, cornerTrRadius, cornerTrRadius, cornerBrRadius, cornerBrRadius, cornerBlRadius, cornerBlRadius});
-            mask.setStroke(5, defaultDisableColor);
-            int disableColor = defaultDisableColor;
-            int checkedColor = backgroundPressedRipple;
-            if (backgroundDisable != null && backgroundDisable instanceof ColorDrawable) {
-                disableColor = ((ColorDrawable) backgroundDisable).getColor();
-            }
-            if (backgroundChecked != null && backgroundChecked instanceof ColorDrawable) {
-                checkedColor = ((ColorDrawable) backgroundChecked).getColor();
-            }
-            return new ExtendRippleDrawable(createColorStateList(backgroundPressedRipple, backgroundPressedRipple, checkedColor, disableColor), background, mask)
+            targetDrawable = new ExtendRippleDrawable.Builder()
+                    .setBackground(background, backgroundPressedRipple, backgroundChecked, backgroundDisable)
                     .setShadow(shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY)
                     .setCornerRadius(cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius)
-                    .setStrokeWidth(strokeWidth);
+                    .setStroke(strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor)
+                    .apply();
         }
-        ExtendStateListDrawable drawable = new ExtendStateListDrawable(background, backgroundPressed, backgroundChecked, backgroundDisable);
-        drawable.setShadow(shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY)
+        if (targetDrawable == null) targetDrawable = new ExtendStateListDrawable(background, backgroundPressed, backgroundChecked, backgroundDisable)
+                .setShadow(shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY)
                 .setCornerRadius(cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius)
                 .setStroke(strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor)
                 .apply();
         if (shadowRadius > 0 && targetViewReference != null && targetViewReference.get() != null) {
-            drawable.calculateAndSetPaddingForTargetView(targetViewReference.get());
+            calculateAndSetPaddingForTargetView(targetViewReference.get(), targetDrawable.getShadowPadding());
             targetViewReference.clear();
         } else if (shadowRadius > 0) {
             Log.e("BackgroundBuilder", "the shadow effect is broken, please set target view by invoke BackgroundBuilder.setTargetView()");
         }
-        return drawable;
+        if (targetDrawable == null) throw new NullPointerException("unknown error!");
+        return targetDrawable.getDrawable();
     }
 
     /**
@@ -502,17 +486,48 @@ public class BackgroundBuilder {
     }
 
     /**
+     * if the drawable has shadow or stroke, the view's content region should be fit the drawable's content region
+     *
+     * @param drawableShadowPadding left,top,right,bottom
+     */
+    private void calculateAndSetPaddingForTargetView(View targetView, int[] drawableShadowPadding) {
+        if (targetView == null) return;
+        int l, r, t, b;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            l = targetView.getPaddingStart() != 0 ? targetView.getPaddingStart() : targetView.getPaddingLeft();
+        } else l = targetView.getPaddingLeft();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            r = targetView.getPaddingEnd() != 0 ? targetView.getPaddingEnd() : targetView.getPaddingRight();
+        } else r = targetView.getPaddingRight();
+        t = targetView.getPaddingTop();
+        b = targetView.getPaddingBottom();
+        l += drawableShadowPadding[0] + strokeWidth;
+        t += drawableShadowPadding[1] + strokeWidth;
+        r += drawableShadowPadding[2] + strokeWidth;
+        b += drawableShadowPadding[3] + strokeWidth;
+        targetView.setPadding(l, t, r, b);
+    }
+
+    /**
      * create cornerDrawable , can only dispose BitmapDrawable、ColorDrawable、GradientDrawable<br/>
      * <em>if src is BitmapDrawable then convert it to ExtendBitmapDrawable; else if is GradientDrawable then convert to ShadowGradientDrawable;</em> <br/>
      */
-    static Drawable createCornerDrawable(Drawable src, float tlRadius, float trRadius, float blRadius, float brRadius) {
+    static Drawable createCornerDrawable(Drawable src, float[] radius) {
         if (src == null) return null;
-        if (tlRadius == 0 && trRadius == 0 && blRadius == 0 && brRadius == 0) return src;
+        if (radius == null || radius.length != 8) return src;
+        boolean hasRoundCorner = false;
+        for (float r : radius) {
+            if (r > 0) {
+                hasRoundCorner = true;
+                break;
+            }
+        }
+        if (!hasRoundCorner) return src;
         if (src instanceof BitmapDrawable) {
             if (!(src instanceof ExtendBitmapDrawable)) {
                 src = new ExtendBitmapDrawable().loadAttrFrom((BitmapDrawable) src);
             }
-            ((ExtendBitmapDrawable) src).setCornerRadius(tlRadius, trRadius, blRadius, brRadius);
+            ((ExtendBitmapDrawable) src).setCornerRadius(radius);
         }
         if (src instanceof ColorDrawable) {
             int color = ((ColorDrawable) src).getColor();
@@ -520,7 +535,7 @@ public class BackgroundBuilder {
             ((GradientDrawable) src).setColor(color);
         }
         if (src instanceof GradientDrawable) {
-            ((GradientDrawable) src).setCornerRadii(new float[]{tlRadius, tlRadius, trRadius, trRadius, brRadius, brRadius, blRadius, blRadius});
+            ((GradientDrawable) src).setCornerRadii(radius);
         }
         return src;
     }

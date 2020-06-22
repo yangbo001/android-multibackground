@@ -12,9 +12,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
-import android.view.View;
 
-class ExtendStateListDrawable extends StateListDrawable {
+class ExtendStateListDrawable extends StateListDrawable implements ShadowDrawable {
 
     Rect originDrawableRect = new Rect(); // the origin drawable rect
     Drawable normalDrawable, disableDrawable, pressedDrawable, checkedDrawable;
@@ -46,6 +45,7 @@ class ExtendStateListDrawable extends StateListDrawable {
         originDrawableRect.set(bounds);
         bounds.set(bounds.left + drawableShadowPadding[0], bounds.top + drawableShadowPadding[1],
                 bounds.right - drawableShadowPadding[2], bounds.bottom - drawableShadowPadding[3]);
+        super.setBounds(bounds);
     }
 
     @Override
@@ -54,7 +54,8 @@ class ExtendStateListDrawable extends StateListDrawable {
         super.draw(canvas);
     }
 
-    private void compatDrawShadowLayer(Canvas canvas) {
+    @Override
+    public void compatDrawShadowLayer(Canvas canvas) {
         Path path = new Path();
         Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
         Rect rect = getBounds();
@@ -94,6 +95,16 @@ class ExtendStateListDrawable extends StateListDrawable {
         }
     }
 
+    @Override
+    public int[] getShadowPadding() {
+        return drawableShadowPadding;
+    }
+
+    @Override
+    public Drawable getDrawable() {
+        return this;
+    }
+
     ExtendStateListDrawable setCornerRadius(float tlRadius, float trRadius, float blRadius, float brRadius) {
         cornerRadius = new float[]{tlRadius, tlRadius, trRadius, trRadius, brRadius, brRadius, blRadius, blRadius};
         return this;
@@ -120,8 +131,8 @@ class ExtendStateListDrawable extends StateListDrawable {
         return this;
     }
 
-    void apply() {
-        normalDrawable = BackgroundBuilder.createCornerDrawable(normalDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
+    ExtendStateListDrawable apply() {
+        normalDrawable = BackgroundBuilder.createCornerDrawable(normalDrawable, cornerRadius);
         if (normalDrawable instanceof ExtendBitmapDrawable) {
             int pressColor = Color.TRANSPARENT, checkedColor = Color.TRANSPARENT, disableColor = Color.TRANSPARENT;
             if (pressedDrawable instanceof ColorDrawable) {
@@ -143,11 +154,11 @@ class ExtendStateListDrawable extends StateListDrawable {
         } else {
             BackgroundBuilder.setDrawableStroke(normalDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
         }
-        pressedDrawable = BackgroundBuilder.createCornerDrawable(pressedDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
+        pressedDrawable = BackgroundBuilder.createCornerDrawable(pressedDrawable, cornerRadius);
         BackgroundBuilder.setDrawableStroke(pressedDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
-        checkedDrawable = BackgroundBuilder.createCornerDrawable(checkedDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
+        checkedDrawable = BackgroundBuilder.createCornerDrawable(checkedDrawable, cornerRadius);
         BackgroundBuilder.setDrawableStroke(checkedDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
-        disableDrawable = BackgroundBuilder.createCornerDrawable(disableDrawable, cornerRadius[0], cornerRadius[2], cornerRadius[6], cornerRadius[4]);
+        disableDrawable = BackgroundBuilder.createCornerDrawable(disableDrawable, cornerRadius);
         BackgroundBuilder.setDrawableStroke(disableDrawable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
 
         if (checkedDrawable != null) {
@@ -159,27 +170,7 @@ class ExtendStateListDrawable extends StateListDrawable {
         }
         addState(new int[]{-android.R.attr.state_enabled}, disableDrawable);
         addState(new int[]{}, normalDrawable);
-    }
-
-    /**
-     * if the drawable has shadow or stroke, the view's content region should be fit the drawable's content region
-     */
-    void calculateAndSetPaddingForTargetView(View targetView) {
-        if (targetView == null) return;
-        int l, r, t, b;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            l = targetView.getPaddingStart() != 0 ? targetView.getPaddingStart() : targetView.getPaddingLeft();
-        } else l = targetView.getPaddingLeft();
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            r = targetView.getPaddingEnd() != 0 ? targetView.getPaddingEnd() : targetView.getPaddingRight();
-        } else r = targetView.getPaddingRight();
-        t = targetView.getPaddingTop();
-        b = targetView.getPaddingBottom();
-        l += drawableShadowPadding[0] + strokeWidth;
-        t += drawableShadowPadding[1] + strokeWidth;
-        r += drawableShadowPadding[2] + strokeWidth;
-        b += drawableShadowPadding[3] + strokeWidth;
-        targetView.setPadding(l, t, r, b);
+        return this;
     }
 
     /**

@@ -1,3 +1,3 @@
-include ':libary'
+include ':library'
 include ':app'
 rootProject.name = "MultiBackground"

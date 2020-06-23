@@ -18,7 +18,7 @@ class ExtendBitmapDrawable extends BitmapDrawable {
     private Path path = new Path();
     private RectF rectF = new RectF();
     
-    private float[] cornerRadius = new float[]{0, 0, 0, 0, 0, 0, 0, 0};
+    private float[] cornerRadius = new float[8];
     // stroke
     private int strokeWidth, strokeDashWidth, strokeDashGap;
     private int currentStrokeColor, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor;

@@ -113,28 +113,72 @@ public class BackgroundBuilder {
      */
     public Drawable buildDrawable() {
         if (background == null) background = new ColorDrawable(Color.TRANSPARENT);
-        ShadowDrawable targetDrawable = null;
+        Attrs attr = new Attrs();
+        attr.setShadow(shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY);
+        attr.setCornerRadius(cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius);
+        attr.setStroke(strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+
+        Drawable targetDrawable = null;
+        background = createCornerDrawable(background, attr.cornerRadii);
+        // create ripple drawable
         if (backgroundPressedRipple != Color.TRANSPARENT && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            targetDrawable = new ExtendRippleDrawable.Builder()
-                    .setBackground(background, backgroundPressedRipple, backgroundChecked, backgroundDisable)
-                    .setShadow(shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY)
-                    .setCornerRadius(cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius)
-                    .setStroke(strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor)
-                    .apply();
+            setDrawableStroke(background, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+            if (background instanceof ExtendBitmapDrawable && backgroundDisable instanceof ColorDrawable) {
+                ((ExtendBitmapDrawable) background).setBackgroundStateColor(Color.TRANSPARENT, Color.TRANSPARENT, ((ColorDrawable) backgroundDisable).getColor());
+                ((ExtendBitmapDrawable) background).setStateEnable();
+            }
+            GradientDrawable mask = new GradientDrawable();
+            mask.setColor(BackgroundBuilder.defaultDisableColor);
+            mask.setCornerRadii(attr.cornerRadii);
+            mask.setStroke(5, BackgroundBuilder.defaultDisableColor);
+            targetDrawable = new ExtendRippleDrawable(ColorStateList.valueOf(backgroundPressedRipple), background, mask, attr);
         }
-        if (targetDrawable == null) targetDrawable = new ExtendStateListDrawable(background, backgroundPressed, backgroundChecked, backgroundDisable)
-                .setShadow(shadowColor, shadowRadius, shadowOffsetX, shadowOffsetY)
-                .setCornerRadius(cornerTlRadius, cornerTrRadius, cornerBlRadius, cornerBrRadius)
-                .setStroke(strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor)
-                .apply();
+        // create state list drawable
+        if (targetDrawable == null) {
+            if (background instanceof ExtendBitmapDrawable) {
+                int pressColor = Color.TRANSPARENT, checkedColor = Color.TRANSPARENT, disableColor = Color.TRANSPARENT;
+                if (backgroundPressed instanceof ColorDrawable) {
+                    pressColor = ((ColorDrawable) backgroundPressed).getColor();
+                    backgroundPressed = null;
+                }
+                if (backgroundChecked instanceof ColorDrawable) {
+                    checkedColor = ((ColorDrawable) backgroundChecked).getColor();
+                    backgroundChecked = null;
+                }
+                if (backgroundDisable instanceof ColorDrawable) {
+                    disableColor = ((ColorDrawable) backgroundDisable).getColor();
+                    backgroundDisable = null;
+                }
+                ((ExtendBitmapDrawable) background).setBackgroundStateColor(pressColor, checkedColor, disableColor);
+                ((ExtendBitmapDrawable) background).setStateEnable();
+            }
+            setDrawableStroke(background, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+            backgroundPressed = createCornerDrawable(backgroundPressed, attr.cornerRadii);
+            setDrawableStroke(backgroundPressed, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+            backgroundChecked = createCornerDrawable(backgroundChecked, attr.cornerRadii);
+            setDrawableStroke(backgroundChecked, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+            backgroundDisable = createCornerDrawable(backgroundDisable, attr.cornerRadii);
+            setDrawableStroke(backgroundDisable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+            ExtendStateListDrawable stateListDrawable = new ExtendStateListDrawable(attr);
+            if (backgroundChecked != null) {
+                stateListDrawable.addState(new int[]{-android.R.attr.state_checked, -android.R.attr.state_pressed, android.R.attr.state_enabled}, background);
+                stateListDrawable.addState(new int[]{android.R.attr.state_checked, android.R.attr.state_enabled}, backgroundChecked);
+            }
+            if (backgroundPressed != null) {
+                stateListDrawable.addState(new int[]{android.R.attr.state_pressed, android.R.attr.state_enabled}, backgroundPressed);
+            }
+            if (backgroundDisable != null) stateListDrawable.addState(new int[]{-android.R.attr.state_enabled}, backgroundDisable);
+            stateListDrawable.addState(new int[]{}, background);
+            targetDrawable = stateListDrawable;
+        }
+        // try to resize the target view padding
         if (shadowRadius > 0 && targetViewReference != null && targetViewReference.get() != null) {
-            calculateAndSetPaddingForTargetView(targetViewReference.get(), targetDrawable.getShadowPadding());
+            calculateAndSetPaddingForTargetView(targetViewReference.get(), attr.shadowPadding);
             targetViewReference.clear();
         } else if (shadowRadius > 0) {
             Log.e("BackgroundBuilder", "the shadow effect is broken, please set target view by invoke BackgroundBuilder.setTargetView()");
         }
-        if (targetDrawable == null) throw new NullPointerException("unknown error!");
-        return targetDrawable.getDrawable();
+        return targetDrawable;
     }
 
     /**
@@ -512,7 +556,7 @@ public class BackgroundBuilder {
      * create cornerDrawable , can only dispose BitmapDrawable、ColorDrawable、GradientDrawable<br/>
      * <em>if src is BitmapDrawable then convert it to ExtendBitmapDrawable; else if is GradientDrawable then convert to ShadowGradientDrawable;</em> <br/>
      */
-    static Drawable createCornerDrawable(Drawable src, float[] radius) {
+    private Drawable createCornerDrawable(Drawable src, float[] radius) {
         if (src == null) return null;
         if (radius == null || radius.length != 8) return src;
         boolean hasRoundCorner = false;
@@ -540,15 +584,14 @@ public class BackgroundBuilder {
         return src;
     }
 
-    static void setDrawableStroke(Drawable src, int width, int dasWidth, int dashGap, int color, int pressColor, int checkedColor, int disableColor) {
+    private void setDrawableStroke(Drawable src, int width, int dasWidth, int dashGap, int color, int pressColor, int checkedColor, int disableColor) {
         if (width <= 0) return;
         if (src instanceof GradientDrawable) {
             GradientDrawable drawable = (GradientDrawable) src;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (dasWidth > 0) {
-                    drawable.setStroke(width, BackgroundBuilder.createColorStateList(color, pressColor, checkedColor, disableColor),
-                            dasWidth, dashGap);
-                } else drawable.setStroke(width, BackgroundBuilder.createColorStateList(color, pressColor, checkedColor, disableColor));
+                    drawable.setStroke(width, createColorStateList(color, pressColor, checkedColor, disableColor), dasWidth, dashGap);
+                } else drawable.setStroke(width, createColorStateList(color, pressColor, checkedColor, disableColor));
             } else {
                 if (dasWidth > 0) {
                     drawable.setStroke(width, color, dasWidth, dashGap);
@@ -559,7 +602,7 @@ public class BackgroundBuilder {
         }
     }
 
-    static ColorStateList createColorStateList(int normal, int pressed, int checked, int disable) {
+    private ColorStateList createColorStateList(int normal, int pressed, int checked, int disable) {
         int[] colors = new int[]{normal, checked, pressed, disable, normal};
         int[][] states = new int[5][];
         states[0] = new int[]{-android.R.attr.state_checked, -android.R.attr.state_pressed, android.R.attr.state_enabled};

@@ -174,7 +174,7 @@ explain：if the view is child of TextView, you can set the attr for compound li
 ```
 ## Addition
 
-the extension view is only implement the android normal view, if you want to use layout xml attr for your custom view, just extend the custom view and add the following lines to the constructor like this：
+the extension views had implement only the android normal views, if you want to use layout xml attr for your custom view, just extend the custom view and add the following lines to the constructor like this：
 ```java
     public ExtendFrameLayout(Context context, AttributeSet attrs) {
         super(context, attrs);

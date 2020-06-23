@@ -35,7 +35,7 @@ allprojects {
 ```groovy
 dependencies {
   ...
-	implementation 'com.github.yangbo001:android-multibackground:1.0.1'
+	implementation 'com.github.yangbo001:android-multibackground:1.0.2'
 }
 ```
 
@@ -133,6 +133,7 @@ explain：the pressed background is mutually exclusive with pressed ripple anima
 ```
 
 **special for text view**
+
 explain：if the view is child of TextView, you can set the attr for compound like compound drawable size and drawable align to text; and the text color state
 
 ```xml

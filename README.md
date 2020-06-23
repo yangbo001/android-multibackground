@@ -1,5 +1,8 @@
 # android-multibackground
-a background util that can easily create corner、stroke、shadow and the background state showing 
+​		This library can easily apply round corner、stroke、shadow and different state effects to  background drawable. it do not update the view code directly, all the attrs are set to create the suitable drawable and applied to view by setbackground.
+
+​		When we're working on large projects with multiple people, it is difficult to manage the drawable files. lot of times we created many duplicate files, maybe the small differences of ui or didn't check the drawable directories. this lib is to   improve this situation, you can apply the background attrs by setting layout xml or create drawable by java code. also you can define some global theme style  to apply to the different and common views
+
 ### SCREEN SHOT
 
 <center>
@@ -143,7 +146,31 @@ explain：if the view is child of TextView, you can set the attr for compound li
      app:compound_drawable_height="20dp"                   <!--compound drawable height-->
      app:compound_drawable_align_to_text="true"/>          <!--compound drawable align to text-->
 ```
+**theme style**
 
+```xml
+<resources>
+ <style name="ButtonBlue">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="text_pressed_color">@android:color/black</item>
+        <item name="android:background">@android:color/holo_blue_light</item>
+        <item name="background_state_pressed_ripple">@android:color/darker_gray</item>
+    </style>
+    <style name="ButtonBlue.Round_4dp">
+        <item name="background_corner_radius">4dp</item>
+    </style>
+    <style name="ButtonBlue.Round_4dp.StrokeDarkBlue">
+        <item name="background_stroke_width">1dp</item>
+        <item name="background_stroke_color">@android:color/holo_blue_dark</item>
+        <item name="background_stroke_pressed">@android:color/darker_gray</item>
+    </style>
+</resources>
+    
+<support.background.extension.ExtendButton
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        style="@style/ButtonBlue.Round_4dp.StrokeDarkBlue"/>
+```
 ## Addition
 
 the extension view is only implement the android normal view, if you want to use layout xml attr for your custom view, just extend the custom view and add the following lines to the constructor like this：

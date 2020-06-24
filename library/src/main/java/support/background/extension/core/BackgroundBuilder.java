@@ -131,7 +131,7 @@ public class BackgroundBuilder {
             mask.setColor(BackgroundBuilder.defaultDisableColor);
             mask.setCornerRadii(attr.cornerRadii);
             mask.setStroke(5, BackgroundBuilder.defaultDisableColor);
-            targetDrawable = new ExtendRippleDrawable(ColorStateList.valueOf(backgroundPressedRipple), background, mask, attr);
+            targetDrawable = new ShadowRippleDrawable(ColorStateList.valueOf(backgroundPressedRipple), background, mask, attr);
         }
         // create state list drawable
         if (targetDrawable == null) {
@@ -159,7 +159,7 @@ public class BackgroundBuilder {
             setDrawableStroke(backgroundChecked, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
             backgroundDisable = createCornerDrawable(backgroundDisable, attr.cornerRadii);
             setDrawableStroke(backgroundDisable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
-            ExtendStateListDrawable stateListDrawable = new ExtendStateListDrawable(attr);
+            ShadowStateListDrawable stateListDrawable = new ShadowStateListDrawable(attr);
             if (backgroundChecked != null) {
                 stateListDrawable.addState(new int[]{-android.R.attr.state_checked, -android.R.attr.state_pressed, android.R.attr.state_enabled}, background);
                 stateListDrawable.addState(new int[]{android.R.attr.state_checked, android.R.attr.state_enabled}, backgroundChecked);
@@ -412,7 +412,7 @@ public class BackgroundBuilder {
      * load the attrs from layout setting
      */
     public BackgroundBuilder attributeFromView(View targetView, AttributeSet attrs) {
-        targetViewReference = new WeakReference<>(targetView);
+        setTargetView(targetView);
         background = targetView.getBackground();
         if (background == null) background = new ColorDrawable(Color.TRANSPARENT);
         if (attrs != null) {
@@ -556,11 +556,11 @@ public class BackgroundBuilder {
      * create cornerDrawable , can only dispose BitmapDrawable、ColorDrawable、GradientDrawable<br/>
      * <em>if src is BitmapDrawable then convert it to ExtendBitmapDrawable; else if is GradientDrawable then convert to ShadowGradientDrawable;</em> <br/>
      */
-    private Drawable createCornerDrawable(Drawable src, float[] radius) {
+    private Drawable createCornerDrawable(Drawable src, float[] radii) {
         if (src == null) return null;
-        if (radius == null || radius.length != 8) return src;
+        if (radii == null || radii.length != 8) return src;
         boolean hasRoundCorner = false;
-        for (float r : radius) {
+        for (float r : radii) {
             if (r > 0) {
                 hasRoundCorner = true;
                 break;
@@ -571,7 +571,7 @@ public class BackgroundBuilder {
             if (!(src instanceof ExtendBitmapDrawable)) {
                 src = new ExtendBitmapDrawable().loadAttrFrom((BitmapDrawable) src);
             }
-            ((ExtendBitmapDrawable) src).setCornerRadius(radius);
+            ((ExtendBitmapDrawable) src).setCornerRadius(radii);
         }
         if (src instanceof ColorDrawable) {
             int color = ((ColorDrawable) src).getColor();
@@ -579,7 +579,7 @@ public class BackgroundBuilder {
             ((GradientDrawable) src).setColor(color);
         }
         if (src instanceof GradientDrawable) {
-            ((GradientDrawable) src).setCornerRadii(radius);
+            ((GradientDrawable) src).setCornerRadii(radii);
         }
         return src;
     }

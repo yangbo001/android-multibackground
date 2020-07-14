@@ -135,7 +135,6 @@ class ExtendBitmapDrawable extends BitmapDrawable {
         if (target != null) {
             loadAttr("mBitmapState", target);
             loadAttr("mTargetDensity", target);
-            loadAttr("mTintFilter", target);
         }
         return this;
     }

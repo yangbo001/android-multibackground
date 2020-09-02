@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Build;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -126,7 +127,16 @@ public class BackgroundBuilder {
             if (background instanceof ExtendBitmapDrawable && backgroundDisable instanceof ColorDrawable) {
                 ((ExtendBitmapDrawable) background).setBackgroundStateColor(Color.TRANSPARENT, Color.TRANSPARENT, ((ColorDrawable) backgroundDisable).getColor());
                 ((ExtendBitmapDrawable) background).setStateEnable();
+            }else {
+                // create disable drawable
+                StateListDrawable stateListDrawable = new StateListDrawable();
+                backgroundDisable = createCornerDrawable(backgroundDisable, attr.cornerRadii);
+                setDrawableStroke(backgroundDisable, strokeWidth, strokeDashWidth, strokeDashGap, strokeColor, strokePressedColor, strokeCheckedColor, strokeDisableColor);
+                stateListDrawable.addState(new int[]{-android.R.attr.state_enabled}, backgroundDisable);
+                stateListDrawable.addState(new int[]{}, background);
+                background = stateListDrawable;
             }
+            // create ripple mask
             GradientDrawable mask = new GradientDrawable();
             mask.setColor(BackgroundBuilder.defaultDisableColor);
             mask.setCornerRadii(attr.cornerRadii);

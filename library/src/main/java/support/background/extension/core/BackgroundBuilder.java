@@ -127,7 +127,7 @@ public class BackgroundBuilder {
             if (background instanceof ExtendBitmapDrawable && backgroundDisable instanceof ColorDrawable) {
                 ((ExtendBitmapDrawable) background).setBackgroundStateColor(Color.TRANSPARENT, Color.TRANSPARENT, ((ColorDrawable) backgroundDisable).getColor());
                 ((ExtendBitmapDrawable) background).setStateEnable();
-            }else {
+            } else {
                 // create disable drawable
                 StateListDrawable stateListDrawable = new StateListDrawable();
                 backgroundDisable = createCornerDrawable(backgroundDisable, attr.cornerRadii);
@@ -568,6 +568,17 @@ public class BackgroundBuilder {
      */
     private Drawable createCornerDrawable(Drawable src, float[] radii) {
         if (src == null) return null;
+        // convert src drawable to fitted drawable
+        if (src instanceof BitmapDrawable) {
+            if (!(src instanceof ExtendBitmapDrawable)) {
+                src = new ExtendBitmapDrawable().loadAttrFrom((BitmapDrawable) src);
+            }
+        } else if (src instanceof ColorDrawable) {
+            int color = ((ColorDrawable) src).getColor();
+            src = new GradientDrawable();
+            ((GradientDrawable) src).setColor(color);
+        }
+
         if (radii == null || radii.length != 8) return src;
         boolean hasRoundCorner = false;
         for (float r : radii) {
@@ -577,19 +588,11 @@ public class BackgroundBuilder {
             }
         }
         if (!hasRoundCorner) return src;
-        if (src instanceof BitmapDrawable) {
-            if (!(src instanceof ExtendBitmapDrawable)) {
-                src = new ExtendBitmapDrawable().loadAttrFrom((BitmapDrawable) src);
-            }
-            ((ExtendBitmapDrawable) src).setCornerRadius(radii);
-        }
-        if (src instanceof ColorDrawable) {
-            int color = ((ColorDrawable) src).getColor();
-            src = new GradientDrawable();
-            ((GradientDrawable) src).setColor(color);
-        }
+
         if (src instanceof GradientDrawable) {
             ((GradientDrawable) src).setCornerRadii(radii);
+        } else if (src instanceof ExtendBitmapDrawable) {
+            ((ExtendBitmapDrawable) src).setCornerRadius(radii);
         }
         return src;
     }

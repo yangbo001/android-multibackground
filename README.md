@@ -35,7 +35,7 @@ allprojects {
 ```groovy
 dependencies {
   ...
-	implementation 'com.github.yangbo001:android-multibackground:1.0.4'
+	implementation 'com.github.yangbo001:android-multibackground:1.0.5'
 }
 ```
 
